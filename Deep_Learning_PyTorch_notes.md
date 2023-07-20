@@ -1,5 +1,5 @@
 # Deep Learning in PyTorch
-
+Last Updated on Jul 2023
 
 
 ## Simple Neural Networks
@@ -14,12 +14,12 @@ Linear regression model:
 from torch.utils import data
 
 #is_train表示是否希望数据迭代器对象在每个迭代周期内打乱数据
-def load_array(data_arrays, batch_size, is_train=True): 
+def load_array(data_arrays, batch_size, is_train=True):
     #data_arrays是元祖，*data_arrays将元祖解压为独立参数
     dataset = data.TensorDataset(*data_arrays)
     #挑选样本
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
-  
+
 #为了验证是否正常工作，让我们读取并打印第一个小批量样本。这里我们使用iter构造Python迭代器，并使用next从迭代器中获取第一项
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
