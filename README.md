@@ -1,7 +1,7 @@
 # Different DL Models in Pytorch
 
 ## Acknowledgement
-https://zh.d2l.ai/
+https://zh.d2l.ai/<br />
 https://www.youtube.com/@AladdinPersson
 
 ## Deep Learning Course by Mu Li
