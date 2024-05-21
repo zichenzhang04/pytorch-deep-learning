@@ -22,7 +22,6 @@ from torch import nn  # All neural network modules
 from torch.utils.data import (
     DataLoader,
 )  # Gives easier dataset managment by creating mini batches etc.
-from tqdm import tqdm  # For nice progress bar!
 
 # Simple CNN
 class CNN(nn.Module):
@@ -54,6 +53,15 @@ class CNN(nn.Module):
         x = self.fc1(x)
         return x
 
+# helper functions
+def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
+    print("=> Saving checkpoint")
+    torch.save(state, filename)
+
+def load_checkpoint(checkpoint):
+    print("=> Loading checkpoint")
+    model.load_state_dict(checkpoint["state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer"])
 
 # Set device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -61,9 +69,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Hyperparameters
 in_channels = 1
 num_classes = 10
-learning_rate = 3e-4 # karpathy's constant
-batch_size = 64
+learning_rate = 1e-4 # 3e-4 karpathy's constant
+batch_size = 1024
 num_epochs = 3
+load_model = True
 
 # Load Data
 train_dataset = datasets.MNIST(
@@ -82,9 +91,13 @@ model = CNN(in_channels=in_channels, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
+if load_model:
+    load_checkpoint(torch.load("my_checkpoint.pth.tar"))
+
 # Train Network
 for epoch in range(num_epochs):
-    for batch_idx, (data, targets) in enumerate(tqdm(train_loader)):
+    losses = []
+    for batch_idx, (data, targets) in enumerate(train_loader):
         # Get data to cuda if possible
         data = data.to(device=device)
         targets = targets.to(device=device)
@@ -96,9 +109,20 @@ for epoch in range(num_epochs):
         # backward
         optimizer.zero_grad()
         loss.backward()
+        losses.append(loss.item())
 
         # gradient descent or adam step
         optimizer.step()
+
+    avg_loss = sum(losses) / len(losses)
+    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {avg_loss:.2f}')
+    # save checkpoint
+    if epoch == 2:
+        checkpoint = {
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict()
+        }
+        save_checkpoint(checkpoint)
 
 # Check accuracy on training & test to see how good our model
 def check_accuracy(loader, model):
