@@ -1,5 +1,6 @@
 dataset
 *.pth.tar
+flickr8k
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
